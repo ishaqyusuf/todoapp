@@ -1,13 +1,20 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import { ThemeProvider } from "@/components/theme-provider"
-import { TRPCReactProvider } from "@/trpc/client"
+import type { ReactNode } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
+import { TRPCReactProvider } from "@/trpc/client";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <TRPCReactProvider>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        {children}
+      </ThemeProvider>
     </TRPCReactProvider>
-  )
+  );
 }

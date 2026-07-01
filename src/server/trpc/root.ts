@@ -34,7 +34,9 @@ export const appRouter = createTRPCRouter({
       )
       .query(async function (props) {
         const { input, ctx } = props;
-        return [];
+
+        const todos = await prisma.todo.findMany({});
+        return todos;
       }),
     updateTodo: publicProcedure
       .input(
@@ -51,24 +53,24 @@ export const appRouter = createTRPCRouter({
         const { input, ctx } = props;
         return await updateTodo(ctx, input);
       }),
-    deleteTodo: publicProcedure.input(
-      z
-        .object({
+    deleteTodo: publicProcedure
+      .input(
+        z.object({
           id: z.number(),
-        })
-        .mutation(async function (props) {
-          const { input, ctx } = props;
-          const task = await prisma.todo.delete({
-            where: {
-              id: input.id,
-            },
-          });
-          return {
-            success: true,
-            task,
-          };
         }),
-    ),
+      )
+      .mutation(async function (props) {
+        const { input, ctx } = props;
+        const task = await prisma.todo.delete({
+          where: {
+            id: input.id,
+          },
+        });
+        return {
+          success: true,
+          task,
+        };
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

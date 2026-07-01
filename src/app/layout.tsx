@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
+import { Providers } from "@/components/providers";
 // import { usePathname } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -19,14 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+        <Providers
+          
         >
           {children}
-        </ThemeProvider>
+        </Provider>
         {/* {location==='/todoslogin'? <LoginHeader/> :<Header/>} */}
         <Toaster richColors />
       </body>

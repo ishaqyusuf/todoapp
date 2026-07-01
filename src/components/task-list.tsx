@@ -1,6 +1,5 @@
 "use client";
 
-import { DonaState, useDonaStore } from "@/store/dona";
 import {
   InputGroup,
   InputGroupAddon,
@@ -15,12 +14,10 @@ import {
   Square,
   Trash,
 } from "lucide-react";
-import { Controller } from "react-hook-form";
-import { Field } from "./ui/field";
 // import { todo } from "node:test";
 import Link from "next/link";
 import { CategoryIcon } from "./category-icon";
-import { formatDate, isToday } from "date-fns";
+import { formatDate } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +32,7 @@ import { deleteTaskAction } from "@/actions/delete-task";
 import { duplicateTaskAction } from "@/actions/duplicate-task";
 import { completeTaskAction } from "@/actions/complete-task";
 import { useTRPC } from "@/trpc/client";
-type Todo = DonaState["todos"][number];
+import { useQuery } from "@tanstack/react-query";
 interface Props {
   categorySlug: string;
   // todos: {
@@ -54,19 +51,16 @@ interface Props {
 
 export default function TaskList({ categorySlug, todos }: Props) {
   const trpc = useTRPC();
-  const result = useQuery(trpc.dona.getTodos, {
-    categrorySlug: categorySlug,
-  });
-  const { data: trpcTodos, isLoading } = result;
-  const tasks = useDonaStore((state) => state.todos);
-  const categories = useDonaStore((state) => state.categories);
+  const { data: trpcTodos } = useQuery(
+    trpc.dona.getTodos.queryOptions({
+      categorySlug,
+    }),
+  );
+  const visibleTodos = trpcTodos?.length ? trpcTodos : todos;
   // const deleteTodo = useDonaStore((state) => state.deleteTodo);
 
   // const duplicateTodo = useDonaStore((state) => state.duplicateTodo);
   // const completeTodo = useDonaStore((state) => state.completeTodo);
-  const currentCategory = categories.find(
-    (category) => category.slug == categorySlug,
-  )!;
   async function deleteTodo(id: number) {
     const { success } = await deleteTaskAction(id);
     if (success) {
@@ -96,7 +90,7 @@ export default function TaskList({ categorySlug, todos }: Props) {
 
   return (
     <form className="mt-5 -ml-10">
-      {todos.map((todo, index) => {
+      {visibleTodos.map((todo) => {
         const taskCategory = todo.category;
         return (
           <InputGroup
@@ -112,7 +106,9 @@ export default function TaskList({ categorySlug, todos }: Props) {
               <InputGroupAddon align={"inline-start"}>
                 <InputGroupButton
                   onClick={() => {
-                    todo.id && completeTodo(todo.id, todo.isCompleted);
+                    if (todo.id) {
+                      completeTodo(todo.id, todo.isCompleted ?? false);
+                    }
 
                     console.log("mil");
                   }}
@@ -142,8 +138,8 @@ export default function TaskList({ categorySlug, todos }: Props) {
               {/* category is here */}
               {taskCategory && (
                 <CategoryIcon
-                  icon={taskCategory.iconName}
-                  color={taskCategory.color}
+                  icon={taskCategory.iconName ?? undefined}
+                  color={taskCategory.color ?? undefined}
                 />
               )}
             </InputGroupAddon>
