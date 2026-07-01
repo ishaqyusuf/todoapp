@@ -34,6 +34,7 @@ import { GetTodos } from "@/actions/todo";
 import { deleteTaskAction } from "@/actions/delete-task";
 import { duplicateTaskAction } from "@/actions/duplicate-task";
 import { completeTaskAction } from "@/actions/complete-task";
+import { useTRPC } from "@/trpc/client";
 type Todo = DonaState["todos"][number];
 interface Props {
   categorySlug: string;
@@ -52,6 +53,11 @@ interface Props {
 }
 
 export default function TaskList({ categorySlug, todos }: Props) {
+  const trpc = useTRPC();
+  const result = useQuery(trpc.dona.getTodos, {
+    categrorySlug: categorySlug,
+  });
+  const { data: trpcTodos, isLoading } = result;
   const tasks = useDonaStore((state) => state.todos);
   const categories = useDonaStore((state) => state.categories);
   // const deleteTodo = useDonaStore((state) => state.deleteTodo);

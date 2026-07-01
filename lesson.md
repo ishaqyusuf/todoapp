@@ -15,6 +15,18 @@ Getting started with TRPC
     /students/1/grades
 
     const paths = await params.paths;
+[/api/trpc/[..trpc]]
+    /external
+        health: /health/route.ts
+        tickets: /tickets/route.ts
+    /status
+        health: /health/route.ts
 
-
+- src/server/trpc
+    - base.ts
+    - context.ts
+    - root.ts
+- src/trpc
+  - client.tsx
+<!-- fetch("/api/trpc/external/health") -->
 https://swr.vercel.app/docs/getting-started
