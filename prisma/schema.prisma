@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  email      String
+  name       String
+  password   String
+  todos      Todo[]
+  categories Category[]
+  createdAt  DateTime?  @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime?  @updatedAt
+  deletedAt  DateTime?  @db.Timestamp(0)
+
+  @@unique([email, deletedAt])
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  title     String
+  iconName  String?
+  color     String?
+  slug      String
+  // task Task[]
+  todos     Todo[] // @relation(fields: [categoriesId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime? @db.Timestamp(0)
+}
+
+model Todo {
+  id          Int       @id @default(autoincrement())
+  title       String
+  note        String?
+  isCompleted Boolean?  @default(false)
+  createdAt   DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime? @updatedAt
+  deletedAt   DateTime? @db.Timestamp(0)
+  dueDate     DateTime?
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  Int
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+}
